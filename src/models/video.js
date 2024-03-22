@@ -1,5 +1,5 @@
 import mongoose, { Schema } from "mongoose";
-import { User } from "./user";
+import { User } from "./userModel";
 
 const videoSchema = new Schema(
     {
