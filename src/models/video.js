@@ -1,5 +1,6 @@
 import mongoose, { Schema } from "mongoose";
-import { User } from "./userModel";
+import { User } from "./userModel.js";
+
 
 const videoSchema = new Schema(
     {
@@ -13,7 +14,7 @@ const videoSchema = new Schema(
         },
         owner:{
             type: Schema.Types.ObjectId,
-            ref: User,
+            ref: 'User',
             required: true
         },
         title:{

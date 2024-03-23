@@ -1,5 +1,5 @@
 import mongoose, { Schema } from "mongoose";
-import { Video } from "./video";
+import { Video } from "./video.js";
 import jwt from "jsonwebtoken";
 import bcrypt from "bcrypt";
 
@@ -38,7 +38,6 @@ const userSchema = new Schema(
     },
     refreshToken: {
       type: String,
-      required: true,
     },
     watchHistory: [
       {
@@ -54,7 +53,7 @@ const userSchema = new Schema(
 
 userSchema.pre("save", async function (next) {
   if (this.isModified("password")) {
-    this.password = bcrypt.hash(this.password, 10);
+    this.password = await bcrypt.hash(this.password, 10);
     next();
   }
 });
