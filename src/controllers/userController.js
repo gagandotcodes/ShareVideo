@@ -11,7 +11,7 @@ const registerUser = asyncHandler(async (req, res) => {
     console.log('body', body)
 
     // validate fields
-    if(body.password === ''){
+    if(body.password === ''|| body.password.length<8){
         throw new ApiError(400, 'Empty password not allowed!');
     }
 
