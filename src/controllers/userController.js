@@ -11,39 +11,42 @@ const registerUser = asyncHandler(async (req, res) => {
     console.log('body', body)
 
     // validate password
-    if (body.password === '' || body.password.length < 8) {
+    if (body.password === '') {
+        throw new ApiError(400, 'Empty password not allowed!');
+    }
+    if (body.password.length < 8) {
         throw new ApiError(400, 'Empty password not allowed!');
     }
     // validate email
     await validateEmail(body.email);
     //check if user exist
-    const user = await User.findOne({ $or: [{email: body.email}, { username: body.username } ] });
-     console.log('user', user)
+    const user = await User.findOne({ $or: [{ email: body.email }, { username: body.username }] });
+    console.log('user', user)
 
 
     // // get local file paths for avatar and cover image
     const avatarLocalPath = req.files?.avatar[0]?.path;
     let coverImageLocalPath;
-    if(req.files.cover){
+    if (req.files.cover) {
         coverImageLocalPath = req.files?.cover[0]?.path;
     }
 
     // // check if avatar exist
-    if(!avatarLocalPath){
+    if (!avatarLocalPath) {
         throw new ApiError(400, 'Avatar file is required!');
     }
 
     // // upload on cloudinary
     const avatar = await uploadOnCloudinary(avatarLocalPath, 'Avatar');
     let cover;
-    if(coverImageLocalPath){
+    if (coverImageLocalPath) {
         cover = await uploadOnCloudinary(coverImageLocalPath);
     }
 
-    if(!avatar){
+    if (!avatar) {
         throw new ApiError(400, 'Error in upload avatar on cloudinary');
     }
-    if(req.files.cover && !cover){
+    if (req.files.cover && !cover) {
         throw new ApiError(400, 'Error in upload cover on cloudinary');
     }
 
@@ -58,11 +61,11 @@ const registerUser = asyncHandler(async (req, res) => {
         }
     );
 
-    console.log('createUser', createUser)
-    if(createUser){
+    
+    if (createUser) {
         return res.status(201).json(
-        new ApiResponse(200, createUser, 'User registered sucecssfully!')
-    )
+            new ApiResponse(200, createUser, 'User registered sucecssfully!')
+        )
     }
 
 
@@ -70,29 +73,30 @@ const registerUser = asyncHandler(async (req, res) => {
 export default registerUser
 
 async function validateEmail(email) {
-    console.log('inside function validateEmail')
+    //checks if first letter of email is a alphabet
     if ((email[0] > 'a' && email[0] < 'z') || (email[0] > 'A' && email[0] < 'Z')) {
         let count1 = 0;
         let count2 = 0;
-        let count3 = 0;
-        count3 = email.indexOf('@')
-    if (email.indexOf('.') < email.indexOf('@')) {
-        throw new ApiError(400, 'Email not vaid , enter a valid Email!');
-    }
-
-for (let char of email) {
-    if ((char > 'a' && char < 'z') || (char > 'A' && char < 'Z') || (char > 0 && char < 10) || char == '@' || char == '.') {
-        if (char == '@') {
-            count1 = count1 + 1;
+        let indexOfAt = 0;
+        indexOfAt = email.indexOf('@')
+        // checks that . should be after @
+        if (email.indexOf('.') < email.indexOf('@')) {
+            throw new ApiError(400, 'Email not vaid , enter a valid Email!');
         }
-        if (char == '.') {
-            count2 = count2 + 1;
+     // checks if there are more than one occurance of '@' and '.'
+        for (let char of email) {
+            if ((char > 'a' && char < 'z') || (char > 'A' && char < 'Z') || (char > 0 && char < 10) || char == '@' || char == '.') {
+                if (char == '@') {
+                    count1 = count1 + 1;
+                }
+                if (char == '.') {
+                    count2 = count2 + 1;
+                }
+            }
         }
-    }
-}
-if (count1 > 1 || count2 > 1 || count1 < 1 || count2 < 1) {
-    throw new ApiError(400, 'Email not vaid , enter a valid Email!');
-}
+        if (count1 > 1 || count2 > 1 || count1 < 1 || count2 < 1) {
+            throw new ApiError(400, 'Email not vaid , enter a valid Email!');
+        }
 
     } else { throw new ApiError(400, 'Email not vaid , enter a valid Email!') }
 }
