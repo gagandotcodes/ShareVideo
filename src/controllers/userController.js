@@ -1,5 +1,5 @@
-import registerUser from "../services/userServices.js";
-import { asyncHandler } from "../utils/asyncHandler.js";
+import {registerUser} from "../services/userServices.js";
+import {getAllUsers} from "../services/userServices.js";
 
 const register = async (request, response) => {
 
@@ -15,5 +15,16 @@ const register = async (request, response) => {
     return response.status(result.statusCode).send(result)
 }
 
-export {register}
+const getUsers = async (request, response) => {
+    
+    console.log(request)
+    const result = await getAllUsers();
+
+    if(!result.success){
+        return response.status(result.statusCode).send(result)
+    }
+    return response.status(result.statusCode).send(result)
+}
+
+export {register, getUsers}
 // export default registerController
