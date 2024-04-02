@@ -1,6 +1,5 @@
 import { Router } from "express";
-import { register } from "../controllers/userController.js";
-import { getUsers } from "../controllers/userController.js";
+import usercontroller from "../controllers/userController.js";
 import { upload } from "../middlewares/multer.js";
 
 const router = Router();
@@ -17,10 +16,10 @@ router.route("/register").post(
       maxCount: 1,
     },
   ]),
-  register
+  usercontroller.register
 );
 
 // get all users
-router.route("/getUsers").get(getUsers);
+router.route("/getUsers").get(usercontroller.getUsers);
 
 export default router;

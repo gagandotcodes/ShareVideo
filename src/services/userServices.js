@@ -104,14 +104,17 @@ async function validateEmail(email) {
 
 // get all users
 const getAllUsers = async () => {
-  
-    const allUsers = await User.find();
+  const allUsers = await User.find();
 
-    if(allUsers.length === 0){
-      return new ApiError(404, "Data Not Found!");
-    }
+  if (allUsers.length === 0) {
+    return new ApiError(404, "Data Not Found!");
+  }
 
-    return new ApiResponse(200, "User Data", allUsers);
-}
+  return new ApiResponse(200, "User Data", allUsers);
+};
 
-export {registerUser, getAllUsers};
+const userServices = {
+  registerUser,
+  getAllUsers,
+};
+export default userServices;

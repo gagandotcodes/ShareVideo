@@ -1,12 +1,11 @@
-import {registerUser} from "../services/userServices.js";
-import {getAllUsers} from "../services/userServices.js";
+import userServices from "../services/userServices.js";
 
 const register = async (request, response) => {
 
     const body = request.body;
     const files = request.files;
 
-    const result = await registerUser(body, files);
+    const result = await userServices.registerUser(body, files);
 
 
     if(!result.success){
@@ -18,7 +17,7 @@ const register = async (request, response) => {
 const getUsers = async (request, response) => {
     
     console.log(request)
-    const result = await getAllUsers();
+    const result = await userServices.getAllUsers();
 
     if(!result.success){
         return response.status(result.statusCode).send(result)
@@ -26,5 +25,8 @@ const getUsers = async (request, response) => {
     return response.status(result.statusCode).send(result)
 }
 
-export {register, getUsers}
-// export default registerController
+const usercontroller = {
+    register,
+    getUsers
+}
+export default usercontroller
