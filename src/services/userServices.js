@@ -62,7 +62,6 @@ const registerUser = async (body, files) => {
     return new ApiError(500, error.message);
   }
 };
-export default registerUser;
 
 async function validateEmail(email) {
   //checks if first letter of email is a alphabet
@@ -102,3 +101,17 @@ async function validateEmail(email) {
     return new ApiError(400, "Email not vaid , enter a valid Email!");
   }
 }
+
+// get all users
+const getAllUsers = async () => {
+  
+    const allUsers = await User.find();
+
+    if(allUsers.length === 0){
+      return new ApiError(404, "Data Not Found!");
+    }
+
+    return new ApiResponse(200, "User Data", allUsers);
+}
+
+export {registerUser, getAllUsers};
