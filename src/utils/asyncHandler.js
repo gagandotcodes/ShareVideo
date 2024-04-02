@@ -2,12 +2,10 @@
 
 const asyncHandler = (fn) => async (req,res,next) => {
     try {
-        return await fn(req, res, next)
+        return fn(req, res, next)
     } catch (error) {
-        res.status(error || 500).json({
-            success: false,
-            message: error.message
-        })
+        throw error.message
+        
     }
 }
 
