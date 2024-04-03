@@ -64,43 +64,46 @@ const registerUser = async (body, files) => {
 };
 
 async function validateEmail(email) {
+  console.log("inside funcion validmail")
   //checks if first letter of email is a alphabet
   if (
     (email[0] > "a" && email[0] < "z") ||
     (email[0] > "A" && email[0] < "Z")
   ) {
-    let count1 = 0;
-    let count2 = 0;
+    console.log("inside if statement")
+    // // counting the number of "@" 
+    const regexAt = new RegExp('@', 'g');
+    const countOfAt = (email.match(regexAt) || []).length;
+    // console.log(regexAt,countOfAt)
+    // // counting the number of "."
+    const regexDot = new RegExp('\\.', 'g');
+    const countOfDot = (email.match(regexDot) || []).length;
+      // checking @ and .
+    if (!(countOfAt==1 && countOfDot==1)) {
+      return new ApiError(400, "Email not vaid , enter a valid Email!");
+    }
     let indexOfAt = 0;
     indexOfAt = email.indexOf("@");
     // checks that . should be after @
     if (email.indexOf(".") < email.indexOf("@")) {
       return new ApiError(400, "Email not vaid , enter a valid Email!");
     }
-    // checks if there are more than one occurance of '@' and '.'
     for (let char of email) {
-      if (
+      if (!(
         (char > "a" && char < "z") ||
         (char > "A" && char < "Z") ||
         (char > 0 && char < 10) ||
         char == "@" ||
         char == "."
-      ) {
-        if (char == "@") {
-          count1 = count1 + 1;
-        }
-        if (char == ".") {
-          count2 = count2 + 1;
-        }
-      }
+      )) {
+        return new ApiError(400, "Email not vaid , enter a valid Email!");
+      } 
     }
-    if (count1 > 1 || count2 > 1 || count1 < 1 || count2 < 1) {
-      return new ApiError(400, "Email not vaid , enter a valid Email!");
-    }
-  } else {
-    return new ApiError(400, "Email not vaid , enter a valid Email!");
+     
+    }else {console.log("inside else")
+      return new ApiError(400, "Email not vaid , enter a valid Email!");}
+    
   }
-}
 
 // get all users
 const getAllUsers = async () => {
