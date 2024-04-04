@@ -4,15 +4,16 @@ import { User } from "../models/userModel.js";
 import { uploadOnCloudinary } from "../utils/cloudinary.js";
 import { ApiResponse } from "../utils/apiResponse.js";
 
+
 const registerUser = async (body, files) => {
   try {
     // validate password
-
+    
     if (body.password === "") {
       return new ApiError(400, "Password cannot be empty!");
     }
     if (body.password.length < 8) {
-      return new ApiError(400, "Empty password not allowed!");
+      return new ApiError(400, "Password must const 8 letters or more!");
     }
     // validate email
     await validateEmail(body.email);
@@ -113,8 +114,70 @@ const getAllUsers = async () => {
   return new ApiResponse(200, "User Data", allUsers);
 };
 
+const generateAccessAndRefreshTokens = async (userId) => {
+  try {
+    
+    const userInfo = await User.findOne({ _id: userId });
+
+    // gnerate access and refresh token
+    const accessToken = await userInfo.generateAccessToken();
+    const refreshToken = await userInfo.generateRefreshToken();
+    // save refresh token in user
+    userInfo.refreshToken = refreshToken;
+    await userInfo.save({ validateBeforeSave: false })
+    
+    return {accessToken, refreshToken};
+    
+  } catch (error) {
+    return new ApiError(500, "Something went wrong while generating tokens");
+  }
+};
+
+const login = async (userName, password) => {
+  
+  // check if username or email field is present
+  if (!userName) {
+    return new ApiError(400, "Username field required");
+  }
+
+  // get user info
+  const userInfo = await User.findOne({ userName: userName });
+  if (!userInfo) {
+    return new ApiError(404, "User not found!");
+  }
+
+  // check password
+  const isPasswordCorrect = await userInfo.isPasswordCorrect(password);
+  // console.log("Password checking", userInfo.password, isPasswordCorrect);
+  if (!isPasswordCorrect) {
+    return new ApiError(401, "Invalid user credentials!");
+  }
+  // generate access and refresh token
+  const {accessToken, refreshToken} = await generateAccessAndRefreshTokens(userInfo._id);
+  
+  // send access token and refresh token in coockies
+   const loggedInUser = await User.findOne({ _id: userInfo._id }).select('-password -refreshToken');
+
+   const options = {
+    httpOnly: true,
+    secure: true
+   }
+
+    return new ApiResponse(
+      200,
+      'User logged in successfully!',
+      {
+        user: loggedInUser,
+        accessToken,
+        refreshToken,
+        options
+      }
+    )
+};
+
 const userServices = {
   registerUser,
   getAllUsers,
+  login,
 };
 export default userServices;

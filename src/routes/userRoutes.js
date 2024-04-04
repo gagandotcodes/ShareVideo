@@ -22,4 +22,7 @@ router.route("/register").post(
 // get all users
 router.route("/getUsers").get(usercontroller.getUsers);
 
+// get all users
+router.route("/login").post(usercontroller.login);
+
 export default router;

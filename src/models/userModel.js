@@ -60,7 +60,8 @@ userSchema.pre("save", async function (next) {
 
 // generate jwt token
 userSchema.methods.generateAccessToken = async function(){
-   return jwt.sign(
+  
+   const jwtToken = jwt.sign(
     {
         _id: this._id,
         email:this.email,
@@ -72,6 +73,7 @@ userSchema.methods.generateAccessToken = async function(){
         expiresIn: process.env.ACCESS_TOKEN_EXPIRY
     }
    )
+   return jwtToken;
 }
 // generate refresh token
 userSchema.methods.generateRefreshToken = async function(){
