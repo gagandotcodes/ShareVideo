@@ -9,14 +9,10 @@ const register = async (request, response) => {
   if (!result.success) {
     return response.status(result.statusCode).send(result);
   }
-  return response
-    .status(result.statusCode)
-    .send(result);
+  return response.status(result.statusCode).send(result);
 };
 
 const getUsers = async (request, response) => {
-  
-    console.log(request)
   const result = await userServices.getAllUsers();
 
   if (!result.success) {
@@ -40,9 +36,24 @@ const login = async (request, response) => {
     .send(result);
 };
 
+const logout = async (request, response) => {
+  const userId = request.userInfo._id;
+  
+  const result = await userServices.logout(userId);
+  if (!result.success) {
+    return response.status(result.statusCode).send(result);
+  }
+  return response
+    .status(result.statusCode)
+    .clearCookie("accessToken", result.data.options)
+    .clearCookie("refreshToken", result.data.options)
+    .send(result.message);
+};
+
 const usercontroller = {
   register,
   getUsers,
   login,
+  logout,
 };
 export default usercontroller;

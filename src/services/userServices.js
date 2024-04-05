@@ -175,9 +175,31 @@ const login = async (userName, password) => {
     )
 };
 
+// logout user
+const logout = async (userId) => {
+  // make the refresh token undefined
+  const updateUser = await User.updateOne({ _id: userId }, { refreshToken: undefined });
+
+  // remove cookies
+  const options = {
+    httpOnly: true,
+    secure: true
+   }
+
+   return new ApiResponse(
+    200,
+    'User logged out successfully!',
+    {
+      options
+    }
+   )
+
+}
+
 const userServices = {
   registerUser,
   getAllUsers,
   login,
+  logout,
 };
 export default userServices;
