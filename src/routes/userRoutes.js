@@ -26,5 +26,6 @@ router.route("/getUsers").get(usercontroller.getUsers);
 
 router.route("/login").post(usercontroller.login);
 router.route("/logout").post( verifyJwt, usercontroller.logout);
+router.route("/refresh-access-token").post( usercontroller.refreshAccessToken);
 
 export default router;

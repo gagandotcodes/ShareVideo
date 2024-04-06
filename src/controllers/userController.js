@@ -50,10 +50,27 @@ const logout = async (request, response) => {
     .send(result.message);
 };
 
+const refreshAccessToken = async (request, response) => {
+  
+  let incomingRefreshToken = request.cookies.refreshToken || request.body.refreshToken; 
+
+  const result = await userServices.refreshAccessToken(incomingRefreshToken);
+
+  if (!result.success) {
+    return response.status(result.statusCode).send(result);
+  }
+  return response
+    .status(result.statusCode)
+    .cookie("accessToken", result.data.accessToken, result.data.options)
+    .cookie("refreshToken", result.data.refreshToken, result.data.options)
+    .send(result);
+}
+
 const usercontroller = {
   register,
   getUsers,
   login,
   logout,
+  refreshAccessToken
 };
 export default usercontroller;
