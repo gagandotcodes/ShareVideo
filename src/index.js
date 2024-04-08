@@ -4,6 +4,8 @@ import app from "./app.js";
 
 (async () => {
   try {
+    // set mongo debug mode to true 
+    mongoose.set('debug', true);
     // connect to MongoDB
     const connectionInstance = await mongoose
       .connect(`${process.env.MONGODB_URI}/${process.env.DB_NAME}`)

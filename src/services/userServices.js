@@ -4,6 +4,8 @@ import { User } from "../models/userModel.js";
 import { uploadOnCloudinary } from "../utils/cloudinary.js";
 import { ApiResponse } from "../utils/apiResponse.js";
 import Jwt from "jsonwebtoken";
+import { Subscription } from "../models/subscriptionModel.js";
+import Mongoose from "mongoose";
 
 const registerUser = async (body, files) => {
   try {
@@ -251,6 +253,88 @@ const changePassword = async (oldPassword, newPassword, userId) => {
   }
 };
 
+// subscribe channel
+const subscribeChannel = async (channelUserId, userId) => {
+  try {
+    // check if user is already a subscriber of this channel
+    const isSubscribedAlready = await Subscription.findOne({
+      subscriber: userId,
+      channel: channelUserId,
+    });
+
+    if (isSubscribedAlready) {
+      // delete the document. which is equivalent of unsubscribing the channel
+      const deleteSubscription = await Subscription.deleteOne({
+        subscriber: userId,
+        channel: channelUserId,
+      });
+
+      if(deleteSubscription.deletedCount){
+        return new ApiResponse(200, "Channel Unsubscribed!", {});
+      }
+      
+    } else {
+      // make a new document in subscriptions tabel
+      const subscribe = await Subscription.create({
+        subscriber: userId,
+        channel: channelUserId,
+      });
+
+      if (subscribe) {
+        return new ApiResponse(200, "Channel subscribed!", {});
+      }
+    }
+    // make a new document in subscriptions tabel
+    const subscribe = await Subscription.create({
+      subscriber: userId,
+      channel: channelUserId,
+    });
+
+    if (subscribe) {
+      return new ApiResponse(200, "Channel subscribed!", {});
+    }
+  } catch (error) {
+    console.log(error);
+    return new ApiError(500, error.message);
+  }
+};
+
+
+// subscribe channel
+const getChannelInfo = async (channelUserId) => {
+  const channelInfo = await User.aggregate([
+    {
+      $match: {
+        _id: new Mongoose.Types.ObjectId(channelUserId),
+      },
+    },
+    {
+      $lookup: {
+        from: "subscriptions",
+        localField: "_id",
+        foreignField: "channel",
+        as: "sunscribersInfo",
+      },
+    },
+    {
+      $project: {
+        _id: 1,
+        userName: 1,
+        email: 1,
+        fullname: 1,
+        avatar: 1,
+        coverImage: 1,
+        createdAt: 1,
+        numberOfSubscribers: {
+          $size: "$sunscribersInfo",
+        },
+      },
+    },
+  ]);
+
+  return new ApiResponse(200, "Channel Info", channelInfo);
+};
+
 const userServices = {
   registerUser,
   getAllUsers,
@@ -258,5 +342,7 @@ const userServices = {
   logout,
   refreshAccessToken,
   changePassword,
+  subscribeChannel,
+  getChannelInfo
 };
 export default userServices;

@@ -82,12 +82,45 @@ const changePassword = async (request, response) => {
     .send(result);
 }
 
+// Subscribe channel
+const subscribeChannel = async (request, response) => {
+  
+  const { channelUserId } = request.body;
+  const userId = request.userInfo._id;
+  
+
+  const result = await userServices.subscribeChannel(channelUserId, userId);
+
+  if (!result.success) {
+    return response.status(result.statusCode).send(result);
+  }
+  return response
+    .status(result.statusCode)
+    .send(result);
+}
+
+// get user info
+const getChannelInfo = async (request, response) => {
+  
+  const {channelUserId}  = request.query;
+  const result = await userServices.getChannelInfo(channelUserId);
+
+  if (!result.success) {
+    return response.status(result.statusCode).send(result);
+  }
+  return response
+    .status(result.statusCode)
+    .send(result);
+}
+
 const usercontroller = {
   register,
   getUsers,
   login,
   logout,
   refreshAccessToken,
-  changePassword
+  changePassword,
+  subscribeChannel,
+  getChannelInfo
 };
 export default usercontroller;

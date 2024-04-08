@@ -29,5 +29,10 @@ router.route("/logout").post( verifyJwt, usercontroller.logout);
 router.route("/refresh-access-token").post( usercontroller.refreshAccessToken);
 // Change password
 router.route("/change-password").patch( verifyJwt,usercontroller.changePassword);
+// subscribe channel
+router.route("/subscribe-channel").patch( verifyJwt,usercontroller.subscribeChannel);
+// get user info
+router.route("/channel-info").get( verifyJwt,usercontroller.getChannelInfo);
+
 
 export default router;
