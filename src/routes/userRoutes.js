@@ -5,7 +5,7 @@ import { verifyJwt } from "../middlewares/authMiddleware.js";
 
 const router = Router();
 
-// register users
+// Register users
 router.route("/register").post(
   upload.fields([
     {
@@ -19,13 +19,15 @@ router.route("/register").post(
   ]),
   usercontroller.register
 );
-
-// get all users
+// Get all users
 router.route("/getUsers").get(usercontroller.getUsers);
-
-
+// User login
 router.route("/login").post(usercontroller.login);
+// User logout
 router.route("/logout").post( verifyJwt, usercontroller.logout);
+// Refresh access token
 router.route("/refresh-access-token").post( usercontroller.refreshAccessToken);
+// Change password
+router.route("/change-password").patch( verifyJwt,usercontroller.changePassword);
 
 export default router;

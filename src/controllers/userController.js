@@ -66,11 +66,28 @@ const refreshAccessToken = async (request, response) => {
     .send(result);
 }
 
+// Change user password
+const changePassword = async (request, response) => {
+  
+  const { oldPassword, newPassword } = request.body;
+  const userId = request.userInfo._id;
+
+  const result = await userServices.changePassword(oldPassword, newPassword, userId);
+
+  if (!result.success) {
+    return response.status(result.statusCode).send(result);
+  }
+  return response
+    .status(result.statusCode)
+    .send(result);
+}
+
 const usercontroller = {
   register,
   getUsers,
   login,
   logout,
-  refreshAccessToken
+  refreshAccessToken,
+  changePassword
 };
 export default usercontroller;
